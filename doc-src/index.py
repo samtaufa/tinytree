@@ -17,7 +17,7 @@ ns.sidebar = countershape.widgets.SiblingPageIndex(
           )
 this.titlePrefix = "TinyTree Manual - "
 
-ns.ctgrok = countershape.grok.grok("../tinytree.py")
+ns.ctgrok = countershape.grok.parse("../tinytree.py")
 ns.example = readFrom("_example.py")
 
 pages = [
