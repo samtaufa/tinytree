@@ -5,7 +5,7 @@ import countershape.grok
 from countershape.doc import *
 
 this.layout = countershape.layout.Layout("_layout.html")
-this.markdown = "rst"
+this.markdown = markup.RST()
 
 ns.docTitle = "Tinytree Manual"
 ns.docMaintainer = "Aldo Cortesi"
@@ -21,7 +21,7 @@ ns.ctgrok = countershape.grok.parse("../tinytree.py")
 ns.example = readFrom("_example.py")
 
 pages = [
-    Page("index.html", "Introduction"),
-    Page("api.html", "API"),
-    Page("admin.html", "Administrivia")
+    Page("index.mdtext", "Introduction"),
+    Page("api.mdtext", "API"),
+    Page("admin.mdtext", "Administrivia")
 ]
