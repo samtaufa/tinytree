@@ -1,7 +1,6 @@
 import countershape.layout
 import countershape.template
 import countershape.widgets
-import countershape.grok
 from countershape.doc import *
 
 this.layout = countershape.layout.Layout("_layout.html")
@@ -17,11 +16,16 @@ ns.sidebar = countershape.widgets.SiblingPageIndex(
           )
 this.titlePrefix = "TinyTree Manual - "
 
-ns.ctgrok = countershape.grok.parse("../tinytree.py")
-ns.example = readFrom("_example.py")
+rootPath = os.path.abspath(".")
+
+def showsrc(path):        
+    return readFrom(os.path.join(rootPath, path))
+
+ns.showsrc = showsrc
 
 pages = [
-    Page("index.mdtext", "Introduction"),
-    Page("api.mdtext", "API"),
-    Page("admin.mdtext", "Administrivia")
+    Page("index.md", "Introduction"),
+    PythonPage("../tinytree.py", 
+        title="Source"),
+    Page("admin.md", "Administrivia")
 ]

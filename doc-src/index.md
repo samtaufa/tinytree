@@ -16,7 +16,7 @@ Example
 =======
 
 <!--(block|syntax("py"))-->
-$!example!$
+$!showsrc("_example.py")!$
 <!--(end)-->
 
 Output:
