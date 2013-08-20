@@ -1,17 +1,17 @@
 # The MIT License
-# 
+#
 # Copyright (c) 2007 Aldo Cortesi
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to
 # deal in the Software without restriction, including without limitation the
 # rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
 # sell copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,7 +20,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-import sys, itertools, copy
+import sys, itertools, copy, unicodedata
 
 def _isStringLike(anobj):
     try:
@@ -45,7 +45,7 @@ def _isSequenceLike(anobj):
 
 class Tree(object):
     """
-        A simple implementation of an ordered tree 
+        A simple implementation of an ordered tree
     """
     def __init__(self, children = None):
         """
@@ -55,7 +55,7 @@ class Tree(object):
         if children:
             self.addChildrenFromList(children)
         self.parent = None
-            
+
     def addChildrenFromList(self, children):
         """
             Add children to this node.
@@ -63,10 +63,10 @@ class Tree(object):
             :children A nested list specifying a tree of children
         """
         skip = True
-        v = zip(
+        v = list(zip(
             itertools.chain([None], children),
             itertools.chain(children, [None])
-        )
+        ))
         for i in v:
             if skip:
                 skip = False
@@ -168,7 +168,7 @@ class Tree(object):
     def isDescendantOf(self, node):
         """
             Returns true if this node lies on the path to the root from the
-            specified node. 
+            specified node.
 
             :node A Tree object
         """
@@ -176,7 +176,7 @@ class Tree(object):
 
     def isSiblingOf(self, node):
         """
-            Returns true if this node is a sibling of the specified node. 
+            Returns true if this node is a sibling of the specified node.
 
             :node A Tree object
         """
@@ -247,7 +247,7 @@ class Tree(object):
         for i in itr:
             if kwargs:
                 kwpass = False
-                for k, v in kwargs.items():
+                for k, v in list(kwargs.items()):
                     if hasattr(i, k):
                         if not getattr(i, k) == v:
                             break
@@ -258,7 +258,7 @@ class Tree(object):
             else:
                 kwpass = True
             if kwpass:
-                if all(map(lambda x: x(i), func)):
+                if all([x(i) for x in func]):
                     return i
         return None
 
@@ -333,13 +333,13 @@ class Tree(object):
 
     def getPrevious(self):
         """
-            Find the previous node in the preOrder traversal of the tree. 
+            Find the previous node in the preOrder traversal of the tree.
         """
         return self.findBackwards(lambda x: 1)
 
     def getNext(self):
         """
-            Find the next node in the preOrder traversal of the tree. 
+            Find the next node in the preOrder traversal of the tree.
         """
         return self.findForwards(lambda x: 1)
 
@@ -387,11 +387,11 @@ class Tree(object):
             :name Property name
         """
         def fget(self):
-            if self.__dict__.has_key(name):
+            if name in self.__dict__:
                 return self.__dict__[name]
             else:
                 if not self.parent:
-                    raise ValueError, "Property %s not defined."%name
+                    raise ValueError("Property %s not defined."%name)
                 return getattr(self.parent, name)
         def fset(self, value):
             self.__dict__[name] = value
@@ -405,8 +405,11 @@ class Tree(object):
             :outf Output file descriptor.
         """
         for i in self.preOrder():
-            print >> outf, "\t"*(i.getDepth()-1), repr(i)
-    
+            s = "\t"*(i.getDepth()-1)
+            s += unicodedata.normalize('NFKD', unicode(i)).encode('ascii','ignore')
+            outf.write(s)
+            outf.write("\n")
+
     def count(self):
         """
             Number of nodes in this tree, including the root.
@@ -417,7 +420,7 @@ class Tree(object):
 def constructFromList(lst):
     """
         :lst a nested list of Tree objects
-        
+
         Returns a list consisting of the nodes at the base of each tree.  Trees
         are constructed "bottom-up", so all parent nodes for a particular node
         are guaranteed to exist when "addChild" is run.
@@ -426,7 +429,7 @@ def constructFromList(lst):
     for i, val in enumerate(lst):
         if _isSequenceLike(val):
             if i == 0 or _isSequenceLike(lst[i-1]):
-                raise ValueError, "constructFromList: Invalid list."
+                raise ValueError("constructFromList: Invalid list.")
             lst[i-1].addChildrenFromList(val)
         else:
             heads.append(val)
